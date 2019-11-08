@@ -12,6 +12,6 @@ constant: VIS_ID {
 
 visualization: {
   id: "@{VIS_ID}"
-  url: "https://raw.githubusercontent.com/looker/viz-calendar_heatmap-marketplace/master/calendar_chart.js"
+  url: "https://looker-custom-viz-a.lookercdn.com/master/calendar_chart.js"
   label: "@{VIS_LABEL}"
 }
