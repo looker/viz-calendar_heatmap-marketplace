@@ -1,8 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import CalendarHeatmap from './calendar-heatmap.component'
+import CalendarHeatmap from './CalendarHeatmap'
 import * as d3 from "d3";
 import moment from "moment";
+import { timeYears } from "d3";
 
 const colorByOps = {
   SEGMENT: "segment",
@@ -15,11 +16,12 @@ const baseOptions = {
     display: "select",
     values: [
       { "year": "year" },
+      { "year2": "year2" },
       { "month": "month" },
       { "week": "week" },
       { "day": "day" }
     ],
-    default: "year",
+    default: "year2",
     section: "Style",
     order: 100
   },
@@ -50,7 +52,17 @@ const baseOptions = {
     default: "Total Counts",
     section: "Values",
     order: 3
-  }
+  },
+
+  // HIDDEN OPTIONS
+  height: {
+    type: "number",
+    hidden: true
+  },
+  width: {
+    type: "number",
+    hidden: true
+  },
 };
 
 looker.plugins.visualizations.add({
@@ -63,22 +75,21 @@ looker.plugins.visualizations.add({
   updateAsync: function(data, element, config, queryResponse, details, done) {
     this.clearErrors();
 
-    if (queryResponse.fields.measures.length == 0) {
+    if (queryResponse.fields.measure_like.length == 0) {
       this.addError({
         title: "No Measures",
         message: "This chart requires measures."
       });
       return;
     }
-
-    if (queryResponse.fields.dimensions.length == 0) {
+    if (queryResponse.fields.dimension_like.length == 0) {
       this.addError({
         title: "No Dimensions",
         message: "This chart requires dimensions."
       });
       return;
     }
-    if (data == 0) {
+    if (data.length == 0) {
       this.addError({
         title: "No Results",
         message: ""
@@ -86,15 +97,11 @@ looker.plugins.visualizations.add({
       return;
     }
 
-    var firstRow = data;
     const dim1  = queryResponse.fields.dimension_like[0].name;
     const meas1 = queryResponse.fields.measure_like[0].name;
 
-    let reporttime = data.map(d => {return moment(d[dim1].value)} );
-    let now    = moment.max(reporttime).add(1, 'days');
-    let time_ago = moment.min(reporttime);       
-
-    var orlist = d3.timeDays(time_ago, now);
+    element.clientWidth != config.width ? this.trigger("updateConfig", [{width: element.clientWidth}]) : null ; 
+    element.clientHeight != config.height ? this.trigger("updateConfig", [{height: element.clientHeight}]) : null ; 
 
     let chunks = data.map(d => {
       return {
@@ -103,58 +110,8 @@ looker.plugins.visualizations.add({
         date: moment(d[dim1].value)._d
       }
     });
-    console.log(chunks)
-
-    const dataready = orlist.map(function (dateElement, index) {
-          return {
-              date: dateElement,
-              details: data.filter(details => details[dim1].value == moment(dateElement).format('YYYY-MM-DD')).map(function(filrow,err) { 
-                  return {
-                     'name': filrow[dim1].value,
-                     'date': function () {
-                      let projectDate = new Date(dateElement.getTime())
-                      projectDate.setHours(Math.floor(Math.random() * 24))
-                      projectDate.setMinutes(Math.floor(Math.random() * 60))
-                      return projectDate
-                    }(), //filrow[dim1].value,
-                     'value': parseInt(filrow[meas1].value)
-                  }}),
-                  init: function () {
-                    this.total = this.details.reduce(function (prev, e) {
-                      return prev + e.value
-                    }, 0)
-                    return this
-                  } 
-          }.init()
-        });
-
-     const dataclean =  dataready.filter( (ele, ind) => ind === dataready.findIndex( elem => elem.date === ele.date));
-     
-     const finaldata = dataclean.map(d => {
-      let summary = d.details.reduce((uniques, project) => {
-        if (!uniques[project.name]) {
-          uniques[project.name] = {
-            'value': parseInt(project.value)
-          }
-        } else {
-          uniques[project.name].value += project.value
-        }
-        return uniques
-      }, {})
-      let unsorted_summary = Object.keys(summary).map(key => {
-        return {
-          'name': key,
-          'value': parseInt(summary[key].value)
-        }
-      })
-      d.summary = unsorted_summary.sort((a, b) => {
-        return b.value - a.value
-      })
-      return d
-    });
-
-    console.log(finaldata);
-    if (finaldata.length == 0) {
+    
+    if (chunks.length == 0) {
       this.addError({
         title: "Wrong input pattern or insufficient data.",
         message: "Calendar Heatmap requires one non-null date dimension and one measure."
@@ -162,27 +119,20 @@ looker.plugins.visualizations.add({
       return;
     }
 
-    
-    
-   
-    // Finally update the state with our new data
     this.chart = ReactDOM.render(
-  
-        <CalendarHeatmap
-         data            = {finaldata}
-         color           = {config.color_picker}
-         overview        = {config.overview}
-         measure         = {config.measure}
-         totmeasure      = {config.tot_measure}
-         sizeonday       = {config.sizeshape}
-         rows            = {config.rows}
-         startdate       = {time_ago}
-         enddate         = {now}
+      <CalendarHeatmap
+         data = {chunks}
+         width = {config.width}
+         height = {config.height}
+         color = {config.color_picker}
+         overview = {config.overview}
+         measure = {config.measure}
+         totmeasure = {config.tot_measure}
+         sizeonday = {config.sizeshape}
+         rows = {config.rows}
         />,
       element
     );
-
-    // We are done rendering! Let Looker know.
     done();
   }
 });

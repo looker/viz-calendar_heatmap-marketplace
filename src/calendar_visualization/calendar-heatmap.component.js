@@ -13,6 +13,22 @@ const CalendarChartWrapper = styled.div`
   justify-content: center;
   align-items: center;
   text-align: center;
+
+  #calendar-heatmap {
+    font: 10px sans-serif;
+    shape-rendering: crispEdges;
+  }
+  
+  .day {
+    stroke: #ccc;
+  }
+  
+  .month {
+    fill: none;
+    stroke: #000;
+    stroke-width: 2px;
+  }
+  
 `;
 
 class CalendarHeatmap extends React.Component {
@@ -40,47 +56,26 @@ class CalendarHeatmap extends React.Component {
   componentDidUpdate() {
     this.cleanPreviousObjects();
     this.createElements();
+    this.drawChart()
   }
 
   cleanPreviousObjects() {
-    var titlesel = d3.select('#calendar-heatmap').select("svg");
-    titlesel.remove();
+    // var titlesel = d3.select('#calendar-heatmap').selectAll("g");
+    // titlesel.remove();
   }
 
   componentDidMount() {
     this.createElements()  
-    this.parseData()
     this.drawChart()
-    window.addEventListener('resize', this.calcDimensions)
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.calcDimensions)
   }
 
   createElements() {
     // Create svg element
-    this.svg = d3.select('#calendar-heatmap')
-    .append('svg')
-    .attr('class', 'svg')
-
-    // Create other svg elements
-    this.items = this.svg.append('g')
-    this.labels = this.svg.append('g')
-    this.buttons = this.svg.append('g')
-
-    this.tooltip = d3.select('#calendar-heatmap')
-    .append('div')
-    .attr("id", "tooltip")
-    .attr("class", styles.heatmapTooltip)
-    .style("opacity", 1)
-    .style("position", "absolute")
-    .style("text-align", "center")
-    .style("padding", ".5rem")
-    .style("color", "#313639")
-    .style("border-radius", "#8px");
-
-    this.calcDimensions()
+    this.svg = d3.select('#calendar-heatmap');
+    // this.calcDimensions()
   }
 
   // Calculate dimensions based on available width
@@ -95,52 +90,16 @@ class CalendarHeatmap extends React.Component {
     this.svg.attr('width', this.settings.width)
     .attr('height', this.settings.height + 80) // RGB: adding extra space for titles and additional labels
 
-    this.parseData()
-    if ( !!this.props.data && !!this.props.data[0].summary ) {
-      this.drawChart();
-    }
-  }
+    this.drawChart();
 
-  parseData() {
-    this.props.data.map(d => {
-      let summary = d.details.reduce((uniques, project) => {
-        if (!uniques[project.name]) {
-          uniques[project.name] = {
-            'value': project.value
-          }
-        } else {
-          uniques[project.name].value += project.value
-        }
-        return uniques
-      }, {})
-      let unsorted_summary = Object.keys(summary).map(key => {
-        return {
-          'name': key,
-          'value': summary[key].value
-        }
-      })
-      d.summary = unsorted_summary.sort((a, b) => {
-        return b.value - a.value
-      })
-      return d
-    });
+    // if ( !!this.props.data && !!this.props.data[0].summary ) {
+    //   this.drawChart();
+    // }
   }
-
 
   drawChart() {
-    if ( this.overview === 'global' ) {
-      this.drawGlobalOverview()
-    } else if ( this.overview === 'year' ) {
-      this.drawYearOverview()
-    } else if ( this.overview === 'month' ) {
-      this.drawMonthOverview()
-    } else if ( this.overview === 'week' ) {
-      this.drawWeekOverview()
-    } else if ( this.overview === 'day' ) {
-      this.drawDayOverview()
-    }
+    this.drawYearOverview2()
   }
-
 
   /**
    * Draw global overview (multiple years)
@@ -380,6 +339,89 @@ class CalendarHeatmap extends React.Component {
         this.overview = 'year'
         this.drawChart()
       })
+  }
+
+  drawYearOverview2() {
+    var width = this.props.width,
+    height = this.props.height,
+    cellSize = 17; // cell size
+
+    var percent = d3.format(".1%"),
+        format = d3.timeFormat("%Y-%m-%d"),
+        Dayformat = d3.timeFormat("%d");
+
+    let max_value = d3.max(this.props.data, d => d.value.value)
+    let min_value = d3.min(this.props.data, d => d.value.value)
+
+    let max_date = d3.max(this.props.data, d => d.date)
+    let min_date = d3.min(this.props.data, d => d.date)
+
+    let num_years = d3.range(min_date.getYear()+1900, max_date.getYear()+1900+1).length
+
+    let colors = this.props.color.length == 1 ? ["#FAFAFA", this.props.color[0]] : this.props.color ;
+
+    let color = this.props.color.length !== 1 ? 
+                d3.scaleQuantize()
+                .range(colors)
+                .domain([min_value, max_value]) :
+                d3.scaleLinear()
+                .range(colors)
+                .domain([min_value, max_value]) ;
+
+    var svg = d3.select("#calendar-heatmap").selectAll("svg")
+        .data(d3.range(min_date.getYear()+1900, max_date.getYear()+1900+1))
+        .enter().append("svg")
+        .attr("width", width)
+        .attr("height", height/num_years)
+        .attr("class", "year")
+        .append("g")
+        .attr("transform", "translate(" + ((width - cellSize * 53) / 2) + ",5)");
+
+        // .attr("transform", "translate(" + ((width - cellSize * 53) / 2) + "," + (height - cellSize * 7 - 1) + ")");
+
+    svg.append("text")
+        .attr("transform", "translate(-6," + cellSize * 3.5 + ")rotate(-90)")
+        .style("text-anchor", "middle")
+        .text(function(d) { return d; });
+
+    var rect = svg.selectAll(".day")
+        .data(function(d) { return d3.timeDays(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
+        .enter().append("rect")
+        .attr("class", "day")
+        .attr("id", function(d) { return "D" + format(d); })
+        .attr("width", cellSize)
+        .attr("height", cellSize)
+        .attr("fill", "#FFF")
+        .attr("x", function(d) { return d3.timeWeek.count(d3.timeYear(d), d) * cellSize; })
+        .attr("y", function(d) { return d.getDay() * cellSize; });
+
+    rect.append("title")
+        .text(function(d) { return format(d); });
+
+    svg.selectAll(".month")
+        .data(function(d) { return d3.timeMonths(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
+        .enter().append("path")
+        .attr("class", "month")
+        .attr("d", monthPath);
+    
+    this.props.data.forEach( d => {
+      d3.select("#D"+format(d.date))
+      .attr("fill", d.value.value ? color(d.value.value) : "#FFF")
+      .select("title")
+      .text(format(d.date) + ": " + d.value.rendered);
+    })
+
+    function monthPath(t0) {
+      var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),
+          d0 = t0.getDay(), w0 = d3.timeWeek.count(d3.timeYear(t0), t0),
+          d1 = t1.getDay(), w1 = d3.timeWeek.count(d3.timeYear(t1), t1);
+      return "M" + (w0 + 1) * cellSize + "," + d0 * cellSize
+          + "H" + w0 * cellSize + "V" + 7 * cellSize
+          + "H" + w1 * cellSize + "V" + (d1 + 1) * cellSize
+          + "H" + (w1 + 1) * cellSize + "V" + 0
+          + "H" + (w0 + 1) * cellSize + "Z";
+    }
+
   }
 
 

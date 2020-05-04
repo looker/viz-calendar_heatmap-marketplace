@@ -12,7 +12,7 @@ var webpackConfig = {
   },
   output: {
     filename: "[name].js",
-    path: __dirname,
+    path: "/Users/noahmacdonald/dev/dev-viz/dist",
     library: "[name]",
     libraryTarget: "umd"
   },
