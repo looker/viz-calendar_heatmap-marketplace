@@ -97,7 +97,18 @@ const drawCalendar = (props) => {
             var x_date = new Date((min_date.getYear()+1900 + dateParts[d])+1)
             return d3.timeWeek.count(d3.timeYear(nthWeekdayOfMonth(0, 1, x_date)), nthWeekdayOfMonth(0, 1, x_date)) * cellSize + (cellSize * 3.5);
         })
-        .attr("y", 16) : null;
+        .attr("y", 16)
+        .on("mouseover", function(d) {
+            console.log(d+1)
+            svg.selectAll(".day").filter(function(datum) {
+                return datum.getMonth() !== d;
+            })
+            .style("opacity", 0.2);
+        })
+        .on("mouseleave", function(d) {
+            svg.selectAll(".day")
+            .style("opacity", 1);
+        }) : null;
 
     var svg = d3.select(".vis").selectAll(".year")
         .data(d3.range(min_date.getYear()+1900, max_date.getYear()+1900+1))
@@ -108,13 +119,21 @@ const drawCalendar = (props) => {
         .append("g")
         .attr("transform", "translate(" + ((width - cellSize * 53) / 2) + ",5)");
 
-        // .attr("transform", "translate(" + ((width - cellSize * 53) / 2) + "," + (height - cellSize * 7 - 1) + ")");
-
     props.label_year ? svg.append("text")
         .attr("font-size", "2vw")
         .attr("transform", "translate(-6," + cellSize * 3.5 + ")rotate(-90)")
         .style("text-anchor", "middle")
-        .text(function(d) { return d; }) : null ;
+        .text(function(d) { return d; })
+        .on("mouseover", function(d) {
+            svg.selectAll(".day").filter(function(datum) {
+                return (datum.getYear()+1900) !== d;
+            })
+            .style("opacity", 0.2);
+        })
+        .on("mouseleave", function(d) {
+            svg.selectAll(".day")
+            .style("opacity", 1);
+        }) : null ;
 
     var rect = svg.selectAll(".day")
         .data(function(d) { return d3.timeDays(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
@@ -125,10 +144,20 @@ const drawCalendar = (props) => {
         .attr("height", cellSize)
         .attr("rx", props.rounded ? 100 : 0)
         .attr("ry", props.rounded ? 100 : 0)
+        .style("pointer-events","visible")
         .attr("fill", "#FFF")
         .attr("stroke",  "#cecece")
         .attr("x", function(d) { return d3.timeWeek.count(d3.timeYear(d), d) * cellSize; })
-        .attr("y", function(d) { return d.getDay() * cellSize; });
+        .attr("y", function(d) { return d.getDay() * cellSize; })
+        .on("click", function(d) {
+            var target = props.data.filter(function(v) {
+                return format(v.date) === format(d);
+            })
+            LookerCharts.Utils.openDrillMenu({
+                links: target[0].value.links,
+                event: event
+            });
+        });
 
     rect.append("title")
         .text(function(d) { return format(d); });
@@ -140,10 +169,12 @@ const drawCalendar = (props) => {
         .attr("d", monthPath) : null;
     
     props.data.forEach( d => {
-      d3.select("#D"+format(d.date))
-      .attr("fill", d.value.value ? color(d.value.value) : "#FFF")
-      .select("title")
-      .text(format(d.date) + ": " + d.value.rendered);
+        var valueFormatted = props.formatting !== "" ? SSF.format(props.formatting, d.value.value) : LookerCharts.Utils.textForCell(d.value)
+        d3.select("#D"+format(d.date))
+        .attr("fill", d.value.value ? color(d.value.value) : "#FFF")
+        .select("title")
+        .text(format(d.date) + ": " + valueFormatted)
+        .on("click", LookerCharts.Utils.openDrillMenu(d.value.links));
     })
 
     function monthPath(t0) {

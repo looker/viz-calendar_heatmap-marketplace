@@ -18,16 +18,10 @@ const baseOptions = {
     section: "Style",
     order: 4
   },
-  measure: {
+  formatting_override: {
     type: "string",
-    label: "Tooltip Label Override",
-    default: "Counts",
-    section: "Style"
-  },
-  tot_measure: {
-    type: "string",
-    label: "Totals Tooltip Label Override",
-    default: "Total Counts",
+    label: "Value Formatting Override",
+    default: "",
     section: "Style"
   },
   rounded: {
@@ -138,8 +132,7 @@ looker.plugins.visualizations.add({
          overview = {config.overview}
          outline = {config.outline}
          rounded = {config.rounded}
-         measure = {config.measure}
-         totmeasure = {config.tot_measure}
+         formatting = {config.formatting_override}
          sizeonday = {config.sizeshape}
          rows = {config.rows}
          label_year = {config.label_year}
