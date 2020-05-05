@@ -28,6 +28,21 @@ const CalendarChartWrapper = styled.div`
     stroke-width: 2px;
   }
   
+  div.tooltip {	
+    position: absolute;			
+    text-align: center;			
+    width: auto;				
+    height: auto;					
+    padding: 2px;	
+    color: #fff;			
+    font: 12px sans-serif;		
+    background: #444;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}
+
+
 `;
 
 const CalendarHeatmap = (props) => {
@@ -46,6 +61,10 @@ const drawCalendar = (props) => {
     var percent = d3.format(".1%"),
         format = d3.timeFormat("%Y-%m-%d"),
         Dayformat = d3.timeFormat("%d");
+    
+    var tooltip = d3.select(".viz").append("div")	
+    .attr("class", "tooltip")				
+    .style("opacity", 0);
 
     let max_value = d3.max(props.data, d => d.value.value)
     let min_value = d3.min(props.data, d => d.value.value)
@@ -90,7 +109,7 @@ const drawCalendar = (props) => {
         .attr("height", cellSize)
         .attr("fill", "#FFF")
         .attr("x", function(d) { return d3.timeWeek.count(d3.timeYear(d), d) * cellSize; })
-        .attr("y", function(d) { return d.getDay() * cellSize; });
+        .attr("y", function(d) { return d.getDay() * cellSize; })
 
     rect.append("title")
         .text(function(d) { return format(d); });
@@ -103,10 +122,34 @@ const drawCalendar = (props) => {
     
     props.data.forEach( d => {
       d3.select("#D"+format(d.date))
+      .on("mouseover", showTooltip)
+      .on("mouseout",  hideTooltip)
       .attr("fill", d.value.value ? color(d.value.value) : "#FFF")
       .select("title")
-      .text(format(d.date) + ": " + d.value.rendered);
+      .text(format(d.date) + ": " + d.value.value)
+
     })
+
+    function showTooltip(d){
+      let text = d3.select(this).select("title").text()
+      let date = text.split(':')[0]
+      let measure = text.split(':')[1]
+      tooltip.style("opacity", .9)
+      tooltip.html(`
+        ${props.dim_label}: <b>${date}</b></br>\
+        ${props.measure_label}: <b>${measure}</b>
+      `)
+            .style("left", (d3.event.pageX) + "px")		
+            .style("top",  (d3.event.pageY - 28) + "px")
+            .style("cursor", "pointer")
+    }
+
+
+    function hideTooltip() {
+      tooltip.style("opacity", 0);
+    }
+
+  
 
     function monthPath(t0) {
       var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),

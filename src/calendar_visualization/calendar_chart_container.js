@@ -98,7 +98,10 @@ looker.plugins.visualizations.add({
     }
 
     const dim1  = queryResponse.fields.dimension_like[0].name;
+    const dim1_label = queryResponse.fields.dimension_like[0].label_short;
+
     const meas1 = queryResponse.fields.measure_like[0].name;
+    const meas1_label = queryResponse.fields.measure_like[0].label_short;
 
     element.clientWidth != config.width ? this.trigger("updateConfig", [{width: element.clientWidth}]) : null ; 
     element.clientHeight != config.height ? this.trigger("updateConfig", [{height: element.clientHeight}]) : null ; 
@@ -130,6 +133,8 @@ looker.plugins.visualizations.add({
          totmeasure = {config.tot_measure}
          sizeonday = {config.sizeshape}
          rows = {config.rows}
+         measure_label = {meas1_label}
+         dim_label = {dim1_label}
         />,
       element
     );
