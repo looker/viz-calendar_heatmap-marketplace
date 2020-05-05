@@ -10,21 +10,6 @@ const colorByOps = {
   RANGE: "range"
 };
 const baseOptions = {
-  overview: {
-    type: "string",
-    label: "View Level",
-    display: "select",
-    values: [
-      { "year": "year" },
-      { "year2": "year2" },
-      { "month": "month" },
-      { "week": "week" },
-      { "day": "day" }
-    ],
-    default: "year2",
-    section: "Style",
-    order: 100
-  },
   color_picker: {
     type: "array",
     label: "Calendar Color",
@@ -33,33 +18,61 @@ const baseOptions = {
     section: "Style",
     order: 4
   },
-  rows: {
-    type: "number",
-    label: "How many rows?",
-    default: 1,
-    section: "Style"
-  },
   measure: {
     type: "string",
     label: "Tooltip Label Override",
     default: "Counts",
-    section: "Values",
-    order: 2
+    section: "Style"
   },
   tot_measure: {
     type: "string",
     label: "Totals Tooltip Label Override",
     default: "Total Counts",
-    section: "Values",
-    order: 3
+    section: "Style"
+  },
+  rounded: {
+    type: "boolean",
+    label: "Rounded Cells?",
+    default: "false",
+    section: "Style"
+  },
+  outline: {
+    type: "boolean",
+    label: "Month Outline?",
+    default: "true",
+    section: "Style"
+  },
+  label_year: {
+    type: "boolean",
+    label: "Year Labels?",
+    default: "true",
+    section: "Style"
+  },
+  label_month: {
+    type: "boolean",
+    label: "Month Labels?",
+    default: "false",
+    section: "Style"
+  },
+  label_day: {
+    type: "boolean",
+    label: "Day of Week Labels?",
+    default: "false",
+    section: "Style"
+  },
+  show_legend: {
+    type: "boolean",
+    label: "Show Legend?",
+    default: "true",
+    section: "Style"
   },
 
   // HIDDEN OPTIONS
-  height: {
+  cal_h: {
     type: "number",
     hidden: true
   },
-  width: {
+  cal_w: {
     type: "number",
     hidden: true
   },
@@ -70,7 +83,7 @@ looker.plugins.visualizations.add({
   label: "Calendar Heatmap",
   options: baseOptions,
   create: function(element, config) {
-    this.chart = ReactDOM.render(<div></div>, element);
+    this.chart = ReactDOM.render(<div className="vis"></div>, element);
   },
   updateAsync: function(data, element, config, queryResponse, details, done) {
     this.clearErrors();
@@ -100,9 +113,6 @@ looker.plugins.visualizations.add({
     const dim1  = queryResponse.fields.dimension_like[0].name;
     const meas1 = queryResponse.fields.measure_like[0].name;
 
-    element.clientWidth != config.width ? this.trigger("updateConfig", [{width: element.clientWidth}]) : null ; 
-    element.clientHeight != config.height ? this.trigger("updateConfig", [{height: element.clientHeight}]) : null ; 
-
     let chunks = data.map(d => {
       return {
         dimension: d[dim1], 
@@ -122,14 +132,20 @@ looker.plugins.visualizations.add({
     this.chart = ReactDOM.render(
       <CalendarHeatmap
          data = {chunks}
-         width = {config.width}
-         height = {config.height}
+         width = {element.getBoundingClientRect().width}
+         height = {element.getBoundingClientRect().height}
          color = {config.color_picker}
          overview = {config.overview}
+         outline = {config.outline}
+         rounded = {config.rounded}
          measure = {config.measure}
          totmeasure = {config.tot_measure}
          sizeonday = {config.sizeshape}
          rows = {config.rows}
+         label_year = {config.label_year}
+         label_month = {config.label_month}
+         label_week = {config.label_week}
+         legend = {config.show_legend}
         />,
       element
     );
