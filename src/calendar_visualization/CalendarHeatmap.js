@@ -21,6 +21,20 @@ const CalendarChartWrapper = styled.div`
     font-family: sans-serif;
     shape-rendering: crispEdges;
   }
+
+  div.tooltip {	
+    position: absolute;			
+    text-align: center;			
+    width: auto;				
+    height: auto;					
+    padding: 2px;	
+    color: #fff;			
+    font: 12px sans-serif;		
+    background: #444;	
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+  }
   
 `;
 
@@ -42,6 +56,10 @@ const drawCalendar = (props) => {
     var percent = d3.format(".1%"),
         format = d3.timeFormat("%Y-%m-%d"),
         Dayformat = d3.timeFormat("%d");
+    
+    var tooltip = d3.select(".vis").append("div")	
+        .attr("class", "tooltip")				
+        .style("opacity", 0);
 
     let max_value = d3.max(props.data, d => d.value.value)
     let min_value = d3.min(props.data, d => d.value.value)
@@ -142,10 +160,13 @@ const drawCalendar = (props) => {
         .attr("rx", props.rounded ? 100 : 0)
         .attr("ry", props.rounded ? 100 : 0)
         .style("pointer-events","visible")
+        .style("cursor", "pointer")
         .attr("fill", "transparent")
         .attr("stroke",  props.cell_color)
         .attr("x", function(d) { return d3.timeWeek.count(d3.timeYear(d), d) * cellSize; })
         .attr("y", function(d) { return d.getDay() * cellSize; })
+        .on("mouseover", showTooltip )
+        .on("mouseleave", hideTooltip)
         .on("click", function(d) {
             var target = props.data.filter(function(v) {
                 return format(v.date) === format(d);
@@ -156,7 +177,9 @@ const drawCalendar = (props) => {
             });
         });
 
-    rect.append("title")
+    rect.append("span")
+        .attr("display", "none")
+        .append("title")
         .text(function(d) { return format(d); });
 
     props.outline !== "none" ? svg.selectAll(".month")
@@ -215,6 +238,25 @@ const drawCalendar = (props) => {
 
     props.legend ? svg.select(".legendLinear")
     .call(legendLinear) : null;
+
+    function showTooltip(d) {
+        let text = d3.select(this).select("title").text()
+        let date = text.split(':')[0]
+        let measure = text.split(':')[1] ? text.split(':')[1] : ''
+        tooltip.style("opacity", .9)
+        tooltip.html(`
+                ${props.dim_label}: <b>${date}</b></br>\
+                ${ measure === '' ? '' : props.measure_label +':'} <b>${measure}</b>
+            `)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top",  (d3.event.pageY - 28) + "px")
+    }
+
+    function hideTooltip() {
+        tooltip.style("opacity", 0);
+    }
+
+  
 
     function monthPath(t0) {
       var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),

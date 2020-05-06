@@ -149,7 +149,10 @@ looker.plugins.visualizations.add({
     }
 
     const dim1  = queryResponse.fields.dimension_like[0].name;
+    const dim1_label = queryResponse.fields.dimension_like[0].label_short;
+
     const meas1 = queryResponse.fields.measure_like[0].name;
+    const meas1_label = queryResponse.fields.measure_like[0].label_short;
 
     let chunks = data.map(d => {
       return {
@@ -179,6 +182,8 @@ looker.plugins.visualizations.add({
          formatting = {config.formatting_override}
          sizeonday = {config.sizeshape}
          rows = {config.rows}
+         measure_label = {meas1_label}
+         dim_label = {dim1_label}
          label_year = {config.label_year}
          label_month = {config.label_month}
          label_week = {config.label_week}
