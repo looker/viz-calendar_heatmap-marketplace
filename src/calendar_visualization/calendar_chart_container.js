@@ -16,49 +16,93 @@ const baseOptions = {
     display: "colors",
     default: ["#7FCDAE", "#ffed6f", "#EE7772"],
     section: "Style",
-    order: 4
+    order: 0
   },
   formatting_override: {
     type: "string",
     label: "Value Formatting Override",
     default: "",
-    section: "Style"
+    section: "Style",
+    order: 6
   },
   rounded: {
     type: "boolean",
     label: "Rounded Cells?",
     default: "false",
-    section: "Style"
+    section: "Style",
+    order: 4
   },
   outline: {
-    type: "boolean",
-    label: "Month Outline?",
-    default: "true",
-    section: "Style"
+    type: "string",
+    label: "Outline Type",
+    display: "select",
+    section: "Style",
+    values: [
+       {"Month": "month"},
+       {"Quarter": "quarter"},
+       {"None": "none"}
+    ],
+    default: "month",
+    order: 3
   },
   label_year: {
     type: "boolean",
     label: "Year Labels?",
     default: "true",
-    section: "Style"
+    section: "Style",
+    order: 1
   },
   label_month: {
     type: "boolean",
     label: "Month Labels?",
     default: "false",
-    section: "Style"
-  },
-  label_day: {
-    type: "boolean",
-    label: "Day of Week Labels?",
-    default: "false",
-    section: "Style"
+    section: "Style",
+    order: 2,
   },
   show_legend: {
     type: "boolean",
     label: "Show Legend?",
     default: "true",
-    section: "Style"
+    section: "Style",
+    order: 5
+  },
+  outline_weight: {
+    type: "number",
+    label: "Outline Weight",
+    default: 1,
+    section: "‎Advanced",
+    display: "range",
+    min: 0,
+    max: 2,
+    step: 0.1,
+    order: 1
+  },
+  cell_color: {
+    type: "string",
+    label: "Cell Border Color",
+    display: "color",
+    default: "#CECECE",
+    section: "‎Advanced",
+    order: 0
+  },
+  cell_reducer: {
+    type: "number",
+    label: "Cell Weight",
+    default: 1,
+    section: "‎Advanced",
+    display: "range",
+    min: 0,
+    max: 1,
+    step: 0.05,
+    order: 2
+  },
+  axis_label_color: {
+    type: "string",
+    label: "Axis Label Color",
+    display: "color",
+    default: "#282828",
+    section: "‎Advanced",
+    order: 3
   },
 
   // HIDDEN OPTIONS
@@ -139,6 +183,10 @@ looker.plugins.visualizations.add({
          label_month = {config.label_month}
          label_week = {config.label_week}
          legend = {config.show_legend}
+         outline_weight = {config.outline_weight}
+         cell_color = {config.cell_color}
+         cell_reducer = {config.cell_reducer}
+         axis_label_color = {config.axis_label_color}
         />,
       element
     );
