@@ -49,6 +49,7 @@ const CalendarHeatmap = (props) => {
 	useEffect(() => {
         d3.selectAll('.year').remove();
         d3.selectAll('.monthLabels').remove();
+        d3.selectAll('.tooltip').remove();
 		drawCalendar(props)
 	}, [props])
 	return <CalendarChartWrapper className='vis' />
@@ -64,8 +65,8 @@ const drawCalendar = (props) => {
         Dayformat = d3.timeFormat("%d");
     
     var tooltip = d3.select(".vis").append("div")	
-    .attr("class", "tooltip")				
-    .style("opacity", 0);
+        .attr("class", "tooltip")				
+        .style("opacity", 0);
 
     let max_value = d3.max(props.data, d => d.value.value)
     let min_value = d3.min(props.data, d => d.value.value)
@@ -164,6 +165,7 @@ const drawCalendar = (props) => {
         .attr("rx", props.rounded ? 100 : 0)
         .attr("ry", props.rounded ? 100 : 0)
         .style("pointer-events","visible")
+        .style("cursor", "pointer")
         .attr("fill", "#FFF")
         .attr("stroke",  "#cecece")
         .attr("x", function(d) { return d3.timeWeek.count(d3.timeYear(d), d) * cellSize; })
@@ -179,9 +181,11 @@ const drawCalendar = (props) => {
                 event: event
             });
         });
-
-    rect.append("title")
-        .text(function(d) { return format(d); });
+    
+    rect.append("span")
+        .style("display", "none")
+        .append("title")
+        .text(function(d) { return format(d);})
 
     props.outline ? svg.selectAll(".month")
         .data(function(d) { return d3.timeMonths(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
@@ -198,23 +202,21 @@ const drawCalendar = (props) => {
         .on("click", LookerCharts.Utils.openDrillMenu(d.value.links));
     })
 
-    function showTooltip(d){
-      let text = d3.select(this).select("title").text()
-      let date = text.split(':')[0]
-      let measure = text.split(':')[1]
-      tooltip.style("opacity", .9)
-      tooltip.html(`
-        ${props.dim_label}: <b>${date}</b></br>\
-        ${props.measure_label}: <b>${measure}</b>
-      `)
-            .style("left", (d3.event.pageX) + "px")		
-            .style("top",  (d3.event.pageY - 28) + "px")
-            .style("cursor", "pointer")
+    function showTooltip(d) {
+        let text = d3.select(this).select("title").text()
+        let date = text.split(':')[0]
+        let measure = text.split(':')[1] ? text.split(':')[1] : ''
+        tooltip.style("opacity", .9)
+        tooltip.html(`
+                ${props.dim_label}: <b>${date}</b></br>\
+                ${ measure === '' ? '' : props.measure_label +':'} <b>${measure}</b>
+            `)
+                .style("left", (d3.event.pageX) + "px")
+                .style("top",  (d3.event.pageY - 28) + "px")
     }
 
-
     function hideTooltip() {
-      tooltip.style("opacity", 0);
+        tooltip.style("opacity", 0);
     }
 
   
