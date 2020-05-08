@@ -241,11 +241,12 @@ const drawCalendar = (props) => {
     .call(legendLinear) : null;
 
     function showTooltip(d) {
+        var text = d3.select(this).select("title").text();
+        if(!text.split(':')[1]) {return;}
         if(props.focus_tooltip) {
-            d3.selectAll(".day").style("opacity", 0.4);
+            d3.selectAll(".day").style("opacity", 0.2);
             d3.select(this).style("opacity", 1.0);
         }
-        var text = d3.select(this).select("title").text();
         var side = (d3.event.pageX/window.innerWidth)
         tooltip.style("opacity", .9);
         tooltip.html(`
