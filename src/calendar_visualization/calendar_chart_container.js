@@ -23,7 +23,7 @@ const baseOptions = {
     label: "Value Formatting Override",
     default: "",
     section: "Style",
-    order: 6
+    order: 7
   },
   rounded: {
     type: "boolean",
@@ -65,6 +65,13 @@ const baseOptions = {
     default: "true",
     section: "Style",
     order: 5
+  },
+  focus_tooltip: {
+    type: "boolean",
+    label: "Focus Tooltip?",
+    default: "true",
+    section: "Style",
+    order: 6
   },
   outline_weight: {
     type: "number",
@@ -152,7 +159,7 @@ looker.plugins.visualizations.add({
     const dim1_label = queryResponse.fields.dimension_like[0].label_short;
 
     const meas1 = queryResponse.fields.measure_like[0].name;
-    const meas1_label = queryResponse.fields.measure_like[0].label_short;
+    const meas1_label = queryResponse.fields.measure_like[0].label_short ? queryResponse.fields.measure_like[0].label_short : queryResponse.fields.measure_like[0].label;
 
     let chunks = data.map(d => {
       return {
@@ -188,6 +195,7 @@ looker.plugins.visualizations.add({
          label_month = {config.label_month}
          label_week = {config.label_week}
          legend = {config.show_legend}
+         focus_tooltip = {config.focus_tooltip}
          outline_weight = {config.outline_weight}
          cell_color = {config.cell_color}
          cell_reducer = {config.cell_reducer}

@@ -43,6 +43,7 @@ const CalendarHeatmap = (props) => {
         d3.selectAll('.year').remove();
         d3.selectAll('.monthLabels').remove();
         d3.selectAll('.legendSVG').remove();
+        d3.selectAll('.tooltip').remove();
 		drawCalendar(props)
 	}, [props])
 	return <CalendarChartWrapper className='vis' />
@@ -226,8 +227,8 @@ const drawCalendar = (props) => {
     .labelOffset(3)
     .scale(color)
     .on("cellover", function(d) {
-        d3.selectAll(".day").style("opacity", 0.2);
-        d3.selectAll(".day")
+
+        d3.selectAll(".day").style("opacity", 0.2)
         .filter(function() {
             return d3.select(this).attr("fill") == d;
         }).style("opacity", 1);
@@ -240,20 +241,26 @@ const drawCalendar = (props) => {
     .call(legendLinear) : null;
 
     function showTooltip(d) {
-        let text = d3.select(this).select("title").text()
-        let date = text.split(':')[0]
-        let measure = text.split(':')[1] ? text.split(':')[1] : ''
-        tooltip.style("opacity", .9)
+        if(props.focus_tooltip) {
+            d3.selectAll(".day").style("opacity", 0.4);
+            d3.select(this).style("opacity", 1.0);
+        }
+        var text = d3.select(this).select("title").text();
+        var side = (d3.event.pageX/window.innerWidth)
+        tooltip.style("opacity", .9);
         tooltip.html(`
-                ${props.dim_label}: <b>${date}</b></br>\
-                ${ measure === '' ? '' : props.measure_label +':'} <b>${measure}</b>
+                ${props.dim_label}: <b>${text.split(':')[0]}</b></br>\
+                ${text.split(':')[1] ? props.measure_label +':' : ''} <b>${text.split(':')[1] ? text.split(':')[1] : ''}</b>
             `)
-                .style("left", (d3.event.pageX) + "px")
-                .style("top",  (d3.event.pageY - 28) + "px")
+            .style("left", (side > .5 ? (d3.event.pageX - tooltip.style('width').slice(0,-2)) : d3.event.pageX) + "px")
+            .style("top",  (d3.event.pageY - 40) + "px");
+ 
     }
 
     function hideTooltip() {
         tooltip.style("opacity", 0);
+        d3.selectAll(".day").style("opacity", 1); 
+        
     }
 
   
