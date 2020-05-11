@@ -22,6 +22,10 @@ const CalendarChartWrapper = styled.div`
     shape-rendering: crispEdges;
   }
 
+  .hidden {
+      opacity: 0.2;
+  }
+
   div.tooltip {	
     position: absolute;			
     text-align: center;			
@@ -43,6 +47,7 @@ const CalendarHeatmap = (props) => {
         d3.selectAll('.year').remove();
         d3.selectAll('.monthLabels').remove();
         d3.selectAll('.legendSVG').remove();
+        d3.selectAll('.tooltip').remove();
 		drawCalendar(props)
 	}, [props])
 	return <CalendarChartWrapper className='vis' />
@@ -113,11 +118,9 @@ const drawCalendar = (props) => {
         })
         .attr("y", 16)
         .on("mouseover", function(d) {
-            console.log(d+1)
             d3.selectAll(".day").filter(function(datum) {
                 return datum.getMonth() !== d;
-            })
-            .style("opacity", 0.2);
+            }).style("opacity", .2);
         })
         .on("mouseleave", function(d) {
             d3.selectAll(".day")
@@ -142,8 +145,7 @@ const drawCalendar = (props) => {
         .on("mouseover", function(d) {
             d3.selectAll(".day").filter(function(datum) {
                 return (datum.getYear()+1900) !== d;
-            })
-            .style("opacity", 0.2);
+            }).style("opacity", .2);
         })
         .on("mouseleave", function(d) {
             d3.selectAll(".day")
@@ -210,10 +212,15 @@ const drawCalendar = (props) => {
     .append("svg")
     .attr("class", "legendSVG")
     .attr("width", "100%")
-    .attr('font-size', '2vh');
+    .attr('font-size', '1.5vw');
     svg.append("g")
     .attr("class", "legendLinear")
     .attr("transform", "translate(" + legendX + ",10)");
+
+    var range_labels = [];
+    props.color.length !== 1 ? props.color.forEach(function(d, i) {
+        i === 0 ? range_labels.push("less") : i === props.color.length-1 ? range_labels.push("more") : range_labels.push("")
+    }) : range_labels.push("less", "", "", "", "more")
 
     var legendLinear = legendColor()
     .shape(props.rounded ? 'circle' : 'rect')
@@ -222,18 +229,36 @@ const drawCalendar = (props) => {
     .shapeRadius(cellSize/2)
     .cells(props.color.length)
     .orient('horizontal')
-    .labels(["less", "", "", "", "", "", "", "", "", "", "", "more"])
+    .labels(range_labels)
     .labelOffset(3)
     .scale(color)
+    .on("cellclick", function(d) {
+        var legendCell = d3.selectAll(".swatch")
+        .filter(function() {
+            return d3.select(this).style("fill") == hexToRgb(d.slice(1));
+        });
+        legendCell.classed("hidden", !legendCell.classed("hidden"))
+        var days = d3.selectAll(".day")
+        .filter(function() {
+            return d3.select(this).style("fill") == hexToRgb(d.slice(1));
+        });
+        days.classed("hidden", legendCell.classed("hidden"))
+        d3.selectAll(".hidden").style("opacity", 0.2)
+        d3.selectAll(".swatch").style("opacity", 1)
+        d3.selectAll(".swatch.hidden").style("opacity", 0.2)
+    })
     .on("cellover", function(d) {
         d3.selectAll(".day").style("opacity", 0.2);
         d3.selectAll(".day")
         .filter(function() {
-            return d3.select(this).attr("fill") == d;
+            return d3.select(this).attr("fill") == d && d3.select(this).classed("hidden") === false;
         }).style("opacity", 1);
     })
     .on("cellout", function(d) {
-        d3.selectAll(".day").style("opacity", 1.0);
+        d3.selectAll(".day")
+        .filter(function() {
+            return d3.select(this).classed("hidden") === false;
+        }).style("opacity", 1.0);
     });
 
     props.legend ? svg.select(".legendLinear")
@@ -278,6 +303,14 @@ const drawCalendar = (props) => {
             + "H" + (w1 + 1) * cellSize + "V" + 0
             + "H" + (w0 + 1) * cellSize + "Z";
       }
+      function hexToRgb(hex) {
+        var bigint = parseInt(hex, 16);
+        var r = (bigint >> 16) & 255;
+        var g = (bigint >> 8) & 255;
+        var b = bigint & 255;
+    
+        return "rgb(" + r + ", " + g + ", " + b + ")";
+    }
 }
 
 export default CalendarHeatmap
