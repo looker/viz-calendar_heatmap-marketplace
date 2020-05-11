@@ -124,7 +124,7 @@ const drawCalendar = (props) => {
         })
         .on("mouseleave", function(d) {
             d3.selectAll(".day")
-            .style("opacity", 1);
+            .style("opacity", checkHidden);
         }) : null;
 
     var svg = d3.select(".vis").selectAll(".year")
@@ -149,7 +149,7 @@ const drawCalendar = (props) => {
         })
         .on("mouseleave", function(d) {
             d3.selectAll(".day")
-            .style("opacity", 1);
+            .style("opacity", checkHidden);
         }) : null ;
 
     var rect = svg.selectAll(".day")
@@ -266,12 +266,12 @@ const drawCalendar = (props) => {
 
     function showTooltip(d) {
         var text = d3.select(this).select("title").text();
-        if(!text.split(':')[1]) {return;}
+        if(!text.split(':')[1] || d3.select(this).classed("hidden")) { return; }
         if(props.focus_tooltip) {
             d3.selectAll(".day").style("opacity", 0.2);
             d3.select(this).style("opacity", 1.0);
         }
-        var side = (d3.event.pageX/window.innerWidth)
+        var side = (d3.event.pageX/window.innerWidth);
         tooltip.style("opacity", .9);
         tooltip.html(`
                 ${props.dim_label}: <b>${text.split(':')[0]}</b></br>\
@@ -284,12 +284,16 @@ const drawCalendar = (props) => {
 
     function hideTooltip() {
         tooltip.style("opacity", 0);
-        d3.selectAll(".day").style("opacity", 1); 
+        d3.selectAll(".day").style("opacity", checkHidden)
         
     }
 
-  
+    function checkHidden(d) {
+        if(d3.select(this).classed("hidden")) { return 0.2; }
+            return 1;
+    }
 
+  
     function monthPath(t0) {
       var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),
           d0 = t0.getDay(), w0 = d3.timeWeek.count(d3.timeYear(t0), t0),
