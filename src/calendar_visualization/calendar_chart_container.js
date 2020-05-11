@@ -28,7 +28,7 @@ const baseOptions = {
   rounded: {
     type: "boolean",
     label: "Rounded Cells?",
-    default: "false",
+    default: false,
     section: "Style",
     order: 4
   },
@@ -80,7 +80,7 @@ const baseOptions = {
     section: "‎Advanced",
     display: "range",
     min: 0,
-    max: 2,
+    max: 6,
     step: 0.1,
     order: 1
   },
@@ -88,7 +88,15 @@ const baseOptions = {
     type: "string",
     label: "Cell Border Color",
     display: "color",
-    default: "#CECECE",
+    default: "#5e5e5e",
+    section: "‎Advanced",
+    order: 0
+  },
+  outline_color: {
+    type: "string",
+    label: "Outline Color",
+    display: "color",
+    default: "#000",
     section: "‎Advanced",
     order: 0
   },
@@ -200,6 +208,7 @@ looker.plugins.visualizations.add({
          cell_color = {config.cell_color}
          cell_reducer = {config.cell_reducer}
          axis_label_color = {config.axis_label_color}
+         outline_color = {config.outline_color}
         />,
       element
     );

@@ -4,7 +4,7 @@ import 'd3-selection';
 require('d3-selection') 
 import 'd3-transition';
 require('d3-transition') 
-import { legendColor } from 'd3-svg-legend';
+import { legendColor, legendHelpers } from 'd3-svg-legend';
 import SSF from "ssf";
 import styled from "styled-components";
 
@@ -194,7 +194,7 @@ const drawCalendar = (props) => {
         .enter().append("path")
         .attr("class", "month")
         .attr("fill", "none")
-        .attr("stroke", "#000")
+        .attr("stroke", props.outline_color)
         .attr("stroke-width", props.outline_weight)
         .attr("d", props.outline === "quarter" ? quarterPath : monthPath) : null;
     
@@ -229,8 +229,8 @@ const drawCalendar = (props) => {
     .shapeRadius(cellSize/2)
     .cells(props.color.length)
     .orient('horizontal')
-    .labels(range_labels)
-    .labelOffset(3)
+    .labels(legendHelpers.thresholdLabels)
+    .labelOffset(props.height)
     .scale(color)
     .on("cellclick", function(d) {
         var legendCell = d3.selectAll(".swatch")
@@ -248,6 +248,7 @@ const drawCalendar = (props) => {
         d3.selectAll(".swatch.hidden").style("opacity", 0.2)
     })
     .on("cellover", function(d) {
+        d3.select(this).call(showTooltip)
 
         d3.selectAll(".day").style("opacity", 0.2)
         .filter(function() {
@@ -255,11 +256,14 @@ const drawCalendar = (props) => {
         }).style("opacity", 1);
     })
     .on("cellout", function(d) {
+        d3.select(this).call(hideTooltip)
+        
         d3.selectAll(".day")
         .filter(function() {
             return d3.select(this).classed("hidden") === false;
         }).style("opacity", 1.0);
     });
+
 
     props.legend ? svg.select(".legendLinear")
     .call(legendLinear) : null;
