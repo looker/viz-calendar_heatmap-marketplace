@@ -88,7 +88,7 @@ const baseOptions = {
     type: "string",
     label: "Cell Border Color",
     display: "color",
-    default: "#5e5e5e",
+    default: "#fff",
     section: "‎Advanced",
     order: 0
   },

@@ -248,7 +248,7 @@ const drawCalendar = (props) => {
         d3.selectAll(".swatch.hidden").style("opacity", 0.2)
     })
     .on("cellover", function(d) {
-        d3.select(this).call(showTooltip)
+        console.log(d3.select(this).select(".label").text())
 
         d3.selectAll(".day").style("opacity", 0.2)
         .filter(function() {
@@ -256,7 +256,7 @@ const drawCalendar = (props) => {
         }).style("opacity", 1);
     })
     .on("cellout", function(d) {
-        d3.select(this).call(hideTooltip)
+        d3.select(this).select(".label").call(hideTooltip)
         
         d3.selectAll(".day")
         .filter(function() {
