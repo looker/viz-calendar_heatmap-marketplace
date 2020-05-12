@@ -269,21 +269,28 @@ const drawCalendar = (props) => {
     .call(legendLinear) : null;
 
     function showTooltip(d) {
-        var text = d3.select(this).select("title").text();
-        if(!text.split(':')[1] || d3.select(this).classed("hidden") || text.split(':')[1] == ' ∅') { return; }
-        if(props.focus_tooltip) {
-            d3.selectAll(".day").style("opacity", 0.2);
-            d3.select(this).style("opacity", 1.0);
-        }
-        var side = (d3.event.pageX/window.innerWidth);
-        tooltip.style("opacity", .9);
-        tooltip.html(`
-                ${props.dim_label}: <b>${text.split(':')[0]}</b></br>\
-                ${text.split(':')[1] ? props.measure_label +':' : ''} <b>${text.split(':')[1] ? text.split(':')[1] : ''}</b>
-            `)
+        //if showTooltip is passed a selection, then we know it's a legend swatch. Otherwise, it's a normal rect
+        if(d instanceof d3.selection){
+            tooltip.style("opacity", .9);
+            tooltip.html(`<b>${d.text()}</b>`)
+            .style("left", (d3.event.pageX - tooltip.style('width').slice(0,-2)) + "px")
+            .style("top",  (d3.event.pageY - 40) + "px");
+        } else {
+            var side = (d3.event.pageX/window.innerWidth);
+            var text = d3.select(this).select("title").text();
+            if(!text.split(':')[1] || d3.select(this).classed("hidden") || text.split(':')[1] == ' ∅') { return; }
+            if(props.focus_tooltip) {
+                d3.selectAll(".day").style("opacity", 0.2);
+                d3.select(this).style("opacity", 1.0);
+            }
+            tooltip.style("opacity", .9);
+            tooltip.html(`
+                    ${props.dim_label}: <b>${text.split(':')[0]}</b></br>\
+                    ${text.split(':')[1] ? props.measure_label +':' : ''} <b>${text.split(':')[1] ? text.split(':')[1] : ''}</b>
+                `)
             .style("left", (side > .5 ? (d3.event.pageX - tooltip.style('width').slice(0,-2)) : d3.event.pageX) + "px")
             .style("top",  (d3.event.pageY - 40) + "px");
- 
+        }
     }
 
     function hideTooltip() {
