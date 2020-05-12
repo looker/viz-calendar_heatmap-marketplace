@@ -276,6 +276,7 @@ const drawCalendar = (props) => {
             .style("left", (d3.event.pageX - tooltip.style('width').slice(0,-2)) + "px")
             .style("top",  (d3.event.pageY - 40) + "px");
         } else {
+            var side = (d3.event.pageX/window.innerWidth);
             var text = d3.select(this).select("title").text();
             if(!text.split(':')[1] || d3.select(this).classed("hidden") || text.split(':')[1] == ' ∅') { return; }
             if(props.focus_tooltip) {
