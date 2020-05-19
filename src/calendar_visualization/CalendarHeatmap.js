@@ -53,6 +53,8 @@ const CalendarHeatmap = (props) => {
 	return <CalendarChartWrapper className='vis' />
 }
 
+
+
 const drawCalendar = (props) => {
     var width = props.width,
     height = props.height,
@@ -222,6 +224,7 @@ const drawCalendar = (props) => {
         i === 0 ? range_labels.push("less") : i === props.color.length-1 ? range_labels.push("more") : range_labels.push("")
     }) : range_labels.push("less", "", "", "", "more")
 
+
     var legendLinear = legendColor()
     .shape(props.rounded ? 'circle' : 'rect')
     .shapeWidth(cellSize)
@@ -271,8 +274,14 @@ const drawCalendar = (props) => {
     function showTooltip(d) {
         //if showTooltip is passed a selection, then we know it's a legend swatch. Otherwise, it's a normal rect
         if(d instanceof d3.selection){
+            let formatted = d.text().split(" ").map((ele) => {
+                if(isNaN(Number(ele))){
+                    return ele
+                }
+                return props.formatting !== "" ? SSF.format(props.formatting, Number(ele)) : SSF.format(props.value_format, Number(ele))
+            })
             tooltip.style("opacity", .9);
-            tooltip.html(`<b>${d.text()}</b>`)
+            tooltip.html(`<b>${formatted.join(" ")}</b>`)
             .style("left", (d3.event.pageX - tooltip.style('width').slice(0,-2)) + "px")
             .style("top",  (d3.event.pageY - 40) + "px");
         } else {
@@ -280,7 +289,7 @@ const drawCalendar = (props) => {
             var text = d3.select(this).select("title").text();
             if(!text.split(':')[1] || d3.select(this).classed("hidden") || text.split(':')[1] == ' ∅') { return; }
             if(props.focus_tooltip) {
-                d3.selectAll(".day").style("opacity", 0.2);
+                d3.selectAll(".day").style("opacity", 0.4);
                 d3.select(this).style("opacity", 1.0);
             }
             tooltip.style("opacity", .9);

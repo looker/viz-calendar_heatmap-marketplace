@@ -27,7 +27,7 @@ const baseOptions = {
   },
   rounded: {
     type: "boolean",
-    label: "Rounded Cells?",
+    label: "Rounded Cells",
     default: false,
     section: "Style",
     order: 4
@@ -47,28 +47,28 @@ const baseOptions = {
   },
   label_year: {
     type: "boolean",
-    label: "Year Labels?",
+    label: "Year Labels",
     default: "true",
     section: "Style",
     order: 1
   },
   label_month: {
     type: "boolean",
-    label: "Month Labels?",
+    label: "Month Labels",
     default: "false",
     section: "Style",
     order: 2,
   },
   show_legend: {
     type: "boolean",
-    label: "Show Legend?",
+    label: "Show Legend",
     default: "true",
     section: "Style",
     order: 5
   },
   focus_tooltip: {
     type: "boolean",
-    label: "Focus Tooltip?",
+    label: "Focus on Hover",
     default: "true",
     section: "Style",
     order: 6
@@ -163,11 +163,14 @@ looker.plugins.visualizations.add({
       return;
     }
 
+
     const dim1  = queryResponse.fields.dimension_like[0].name;
     const dim1_label = queryResponse.fields.dimension_like[0].label_short;
 
     const meas1 = queryResponse.fields.measure_like[0].name;
     const meas1_label = queryResponse.fields.measure_like[0].label_short ? queryResponse.fields.measure_like[0].label_short : queryResponse.fields.measure_like[0].label;
+
+    const value_format = queryResponse.fields.measure_like[0].value_format != null ? queryResponse.fields.measure_like[0].value_format : ""
 
     let chunks = data.map(d => {
       return {
@@ -199,6 +202,7 @@ looker.plugins.visualizations.add({
          rows = {config.rows}
          measure_label = {meas1_label}
          dim_label = {dim1_label}
+         value_format = {value_format}
          label_year = {config.label_year}
          label_month = {config.label_month}
          label_week = {config.label_week}
