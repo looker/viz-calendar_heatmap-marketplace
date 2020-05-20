@@ -74,15 +74,23 @@ const drawCalendar = (props) => {
 
     let num_years = d3.range(min_date.getYear()+1900, max_date.getYear()+1900+1).length
 
-    let colors = props.color.length == 1 ? ["#FAFAFA", props.color[0]] : props.color ;
+    var Rainbow = require('rainbowvis.js');
+    var rainbow = new Rainbow(); 
+    rainbow.setNumberRange(1, 5);
+    rainbow.setSpectrum("#FAFAFA", props.color[0]);
+    var generatedColor = [];
+    for (var i = 1; i <= 5; i++) {
+        var hexColour = rainbow.colourAt(i);
+        generatedColor.push("#"+hexColour);
+    }
 
-    let color = props.color.length !== 1 ? 
-                d3.scaleQuantize()
+    console.log(generatedColor)
+
+    let colors = props.color.length == 1 ? generatedColor : props.color ;
+
+    let color = d3.scaleQuantize()
                 .range(colors)
-                .domain([min_value, max_value]) :
-                d3.scaleLinear()
-                .range(colors)
-                .domain([min_value, max_value]) ;
+                .domain([min_value, max_value]);
 
     function nthWeekdayOfMonth(weekday, n, date) {
         var count = 0,
@@ -235,12 +243,12 @@ const drawCalendar = (props) => {
     .on("cellclick", function(d) {
         var legendCell = d3.selectAll(".swatch")
         .filter(function() {
-            return d3.select(this).style("fill") == hexToRgb(d.slice(1));
+            return d.toString().includes("#") ? d3.select(this).style("fill") == hexToRgb(d.slice(1)) : d3.select(this).style("fill") == color(d);
         });
         legendCell.classed("hidden", !legendCell.classed("hidden"))
         var days = d3.selectAll(".day")
         .filter(function() {
-            return d3.select(this).style("fill") == hexToRgb(d.slice(1));
+            return d.toString().includes("#") ? d3.select(this).style("fill") == hexToRgb(d.slice(1)) : d3.select(this).style("fill") == color(d);
         });
         days.classed("hidden", legendCell.classed("hidden"))
         d3.selectAll(".hidden").style("opacity", 0.2)
@@ -248,7 +256,7 @@ const drawCalendar = (props) => {
         d3.selectAll(".swatch.hidden").style("opacity", 0.2)
     })
     .on("cellover", function(d) {
-        console.log(d3.select(this).select(".label").text())
+        d3.select(this).select(".label").call(showTooltip)
 
         d3.selectAll(".day").style("opacity", 0.2)
         .filter(function() {

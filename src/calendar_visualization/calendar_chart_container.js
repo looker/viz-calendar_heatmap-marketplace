@@ -14,7 +14,7 @@ const baseOptions = {
     type: "array",
     label: "Calendar Color",
     display: "colors",
-    default: ["#7FCDAE", "#ffed6f", "#EE7772"],
+    default: ["#7FCDAE", "#7ED09C", "#7DD389", "#85D67C", "#9AD97B", "#B1DB7A", "#CADF79", "#E2DF78", "#E5C877", "#E7AF75", "#EB9474", "#EE7772"],
     section: "Style",
     order: 0
   },
@@ -145,6 +145,20 @@ looker.plugins.visualizations.add({
       this.addError({
         title: "No Measures",
         message: "This chart requires measures."
+      });
+      return;
+    }
+    if (queryResponse.fields.measure_like.length > 1) {
+      this.addError({
+        title: "Wrong input data.",
+        message: "This chart requires 1 measure."
+      });
+      return;
+    }
+    if (queryResponse.fields.dimension_like.length > 1) {
+      this.addError({
+        title: "Wrong input data.",
+        message: "This chart requires 1 dimension."
       });
       return;
     }
