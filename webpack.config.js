@@ -3,7 +3,7 @@ var path = require("path");
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 
 var webpackConfig = {
-  mode: 'development',
+  mode: 'production',
   entry: {
     calendar_chart: "./src/calendar_visualization/calendar_chart_container.js",
   },
@@ -12,7 +12,7 @@ var webpackConfig = {
   },
   output: {
     filename: "[name].js",
-    path: "/Users/noahmacdonald/dev/dev-viz/dist",
+    path: __dirname,
     library: "[name]",
     libraryTarget: "umd"
   },
