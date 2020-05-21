@@ -275,10 +275,9 @@ const drawCalendar = (props) => {
         //if showTooltip is passed a selection, then we know it's a legend swatch. Otherwise, it's a normal rect
         if(d instanceof d3.selection){
             let formatted = d.text().split(" ").map((ele) => {
-                if(isNaN(Number(ele))){
-                    return ele
-                }
-                return props.formatting !== "" ? SSF.format(props.formatting, Number(ele)) : SSF.format(props.value_format, Number(ele))
+                if(isNaN(Number(ele))){ return ele; }
+                var defaultFormatting = props.value_format != "" ? SSF.format(props.value_format, Number(ele)) : ele
+                return props.formatting !== "" ? SSF.format(props.formatting, Number(ele)) : defaultFormatting
             })
             tooltip.style("opacity", .9);
             tooltip.html(`<b>${formatted.join(" ")}</b>`)
