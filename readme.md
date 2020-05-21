@@ -43,3 +43,4 @@ Great! Marketplace content -- including visualizations -- were designed for cont
 **`yarn.lock`**: [Yarn](https://yarnpkg.com/) is a package manager alternative to npm. This file serves essentially the same purpose as `package-lock.json`, just for a different package management system.
 
 **`.babelrc`**: A configuration file for the Babel jsx -> js compiler.
+
