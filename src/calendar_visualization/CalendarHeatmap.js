@@ -123,7 +123,7 @@ const drawCalendar = (props) => {
         .attr("font-size", "1.5vw")
         .text(function(d) { return monthNames[d] })
         .attr("x", function(d) {
-            var x_date = new Date((min_date.getYear()+1900 + dateParts[d])+1)
+            var x_date = new Date(((min_date.getYear()+1900 + dateParts[d])+1).replace(/-/g, "/"))
             return d3.timeWeek.count(d3.timeYear(nthWeekdayOfMonth(0, 1, x_date)), nthWeekdayOfMonth(0, 1, x_date)) * cellSize + (cellSize * 3.5);
         })
         .attr("y", 16)
