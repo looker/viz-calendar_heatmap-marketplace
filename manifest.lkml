@@ -12,6 +12,6 @@ constant: VIS_ID {
 
 visualization: {
   id: "@{VIS_ID}"
-  file: "calendar_chart.js"
+  url: "https://marketplace-api.looker.com/viz-dist/calendar_chart.js"
   label: "@{VIS_LABEL}"
 }
