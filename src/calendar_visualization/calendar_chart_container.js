@@ -59,7 +59,7 @@ const baseOptions = {
     section: "Style",
     order: 2,
   },
-  show_legend: {
+  viz_show_legend: {
     type: "boolean",
     label: "Show Legend",
     default: "true",
@@ -220,7 +220,7 @@ looker.plugins.visualizations.add({
          label_year = {config.label_year}
          label_month = {config.label_month}
          label_week = {config.label_week}
-         legend = {config.show_legend}
+         legend = {config.viz_show_legend}
          focus_tooltip = {config.focus_tooltip}
          outline_weight = {config.outline_weight}
          cell_color = {config.cell_color}
