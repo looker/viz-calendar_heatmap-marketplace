@@ -9,8 +9,7 @@ import SSF from "ssf";
 import styled from "styled-components";
 
 const CalendarChartWrapper = styled.div`
-  font-family: "Open Sans", "Noto Sans JP", "Noto Sans", "Noto Sans CJK KR",
-    Helvetica, Arial, sans-serif;
+  font-family: "Open Sans", "Noto Sans JP", "Noto Sans", "Noto Sans CJK KR", Helvetica, Arial, sans-serif;
   color: #3a4245;
   height: 100%;
   justify-content: center;
@@ -85,8 +84,6 @@ const drawCalendar = (props) => {
         var hexColour = rainbow.colourAt(i);
         generatedColor.push("#"+hexColour);
     }
-
-    console.log(generatedColor)
 
     let colors = props.color.length == 1 ? generatedColor : props.color ;
 

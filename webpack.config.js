@@ -24,7 +24,7 @@ var webpackConfig = {
   module: {
     rules: [
       { test: /\.(js|jsx)$/, use: "babel-loader"},
-      { test: /\.css$/, loader: [ 'to-string-loader', 'css-loader' ] }
+      { test: /\.css$/, loader: [ 'to-string-loader', 'css-loader' ] },
     ]
   },
   stats: {}
