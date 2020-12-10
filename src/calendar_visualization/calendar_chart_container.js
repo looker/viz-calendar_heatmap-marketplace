@@ -177,6 +177,20 @@ looker.plugins.visualizations.add({
       return;
     }
 
+    // Used to catch the rare edge case on DB-next that the config is unset
+    const applyDefualtConfig = () => {
+      for (let option in baseOptions) {
+        if (config[option] === undefined) {
+          config[option] = baseOptions[option].default
+        }
+      }
+    }
+    // If color_picker is undefined, chances are 
+    // all other config attributes are also undefined
+    if (config.color_picker === undefined) {
+      applyDefualtConfig()
+    }
+
 
     const dim1  = queryResponse.fields.dimension_like[0].name;
     const dim1_label = queryResponse.fields.dimension_like[0].label_short;

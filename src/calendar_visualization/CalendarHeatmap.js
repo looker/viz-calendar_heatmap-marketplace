@@ -9,7 +9,7 @@ import SSF from "ssf";
 import styled from "styled-components";
 
 const CalendarChartWrapper = styled.div`
-  font-family: "Open Sans", "Noto Sans JP", "Noto Sans", "Noto Sans CJK KR", Helvetica, Arial, sans-serif;
+  font-family: "Roboto", "Open Sans", "Noto Sans JP", "Noto Sans", "Noto Sans CJK KR", Helvetica, Arial, sans-serif;
   color: #3a4245;
   height: 100%;
   justify-content: center;
@@ -26,6 +26,7 @@ const CalendarChartWrapper = styled.div`
   }
 
   div.tooltip {	
+    font-family: "Roboto", "Open Sans", "Noto Sans JP", "Noto Sans", "Noto Sans CJK KR", Helvetica, Arial, sans-serif;
     position: absolute;			
     text-align: center;			
     width: auto;				
@@ -106,12 +107,12 @@ const drawCalendar = (props) => {
     }
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]
     var dateParts = ["-01-01", "-02-01", "-03-01", "-04-01", "-05-01", "-06-01", "-07-01", "-08-01", "-09-01", "-10-01", "-11-01", "-12-01"]
-
+    var monthLabelPadding = 35
     props.label_month ? d3.select(".vis").style("overflow-y", "hidden")
         .append("svg")
         .attr("class", "monthLabels")
         .attr("width", "100%")
-        .attr("height", "20")
+        .attr("height", monthLabelPadding)
         .selectAll("text")
         .data(d3.range(0, 12))
         .enter().append("text")
@@ -123,7 +124,7 @@ const drawCalendar = (props) => {
             var x_date = new Date(((min_date.getYear()+1900 + dateParts[d])+1).replace(/-/g, "/"))
             return d3.timeWeek.count(d3.timeYear(nthWeekdayOfMonth(0, 1, x_date)), nthWeekdayOfMonth(0, 1, x_date)) * cellSize + (cellSize * 3.5);
         })
-        .attr("y", 16)
+        .attr("y", monthLabelPadding - 8)
         .on("mouseover", function(d) {
             d3.selectAll(".day").filter(function(datum) {
                 return datum.getMonth() !== d;
@@ -309,7 +310,6 @@ const drawCalendar = (props) => {
     function hideTooltip() {
         tooltip.style("opacity", 0);
         d3.selectAll(".day").style("opacity", checkHidden)
-        
     }
 
     function checkHidden(d) {
