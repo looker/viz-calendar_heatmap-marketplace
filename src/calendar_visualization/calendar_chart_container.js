@@ -216,7 +216,6 @@ looker.plugins.visualizations.add({
       });
       return;
     }
-    console.log(details)
     this.chart = ReactDOM.render(
       <CalendarHeatmap
          data = {chunks}

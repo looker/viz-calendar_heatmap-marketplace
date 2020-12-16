@@ -186,15 +186,15 @@ const drawCalendar = (props) => {
         .attr("y", function(d) { return d.getDay() * cellSize; })
         .on("mouseover", showTooltip )
         .on("mouseleave", hideTooltip)
-        .on("click", function(d) {
-            var target = props.data.filter(function(v) {
-                return format(v.date) === format(d);
-            })
-            LookerCharts.Utils.openDrillMenu({
-                links: target[0].value.links,
-                event: d3.event
-            });
-        });
+        // .on("click", function(d) {
+        //     var target = props.data.filter(function(v) {
+        //         return format(v.date) === format(d);
+        //     })
+        //     LookerCharts.Utils.openDrillMenu({
+        //         links: target[0].value.links,
+        //         event: d3.event
+        //     });
+        // });
 
     rect.append("span")
         .attr("display", "none")
