@@ -1,9 +1,7 @@
 import React, { useEffect } from 'react';
 import * as d3 from 'd3';
 import 'd3-selection';
-require('d3-selection') 
 import 'd3-transition';
-require('d3-transition') 
 import { legendColor, legendHelpers } from 'd3-svg-legend';
 import SSF from "ssf";
 import styled from "styled-components";
@@ -15,6 +13,8 @@ const CalendarChartWrapper = styled.div`
   justify-content: center;
   align-items: center;
   text-align: center;
+  overflow-x: hidden;
+  overflow-y: auto;
 
   .viz {
     font-family: sans-serif;
@@ -108,7 +108,7 @@ const drawCalendar = (props) => {
     var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"]
     var dateParts = ["-01-01", "-02-01", "-03-01", "-04-01", "-05-01", "-06-01", "-07-01", "-08-01", "-09-01", "-10-01", "-11-01", "-12-01"]
     var monthLabelPadding = 35
-    props.label_month ? d3.select(".vis").style("overflow-y", "hidden")
+    props.label_month ? d3.select(".vis")
         .append("svg")
         .attr("class", "monthLabels")
         .attr("width", "100%")
@@ -220,10 +220,11 @@ const drawCalendar = (props) => {
     .append("svg")
     .attr("class", "legendSVG")
     .attr("width", "100%")
+    .attr("height", 2 * cellSize)
     .attr('font-size', '1.5vw');
     svg.append("g")
     .attr("class", "legendLinear")
-    .attr("transform", "translate(" + legendX + ",10)");
+    .attr("transform", "translate(" + legendX + "," + (props.rounded ? '20' : '10') + ")");
 
     var range_labels = [];
     props.color.length !== 1 ? props.color.forEach(function(d, i) {
