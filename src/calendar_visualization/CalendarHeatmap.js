@@ -158,7 +158,16 @@ const drawCalendar = (props) => {
         .on("mouseleave", function(d) {
             d3.selectAll(".day")
             .style("opacity", checkHidden);
-        }) : null ;
+        }) 
+        // .on("click", function(d) {
+        //     if(props.cross_filter_enabled) {
+        //         LookerCharts.Utils.crossfilter({
+        //             row: d.row,
+        //             event: d3.event
+        //         })
+        //     }
+        // })  
+        : null ;
 
     var rect = svg.selectAll(".day")
         .data(function(d) { return d3.timeDays(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
@@ -183,7 +192,7 @@ const drawCalendar = (props) => {
             })
             LookerCharts.Utils.openDrillMenu({
                 links: target[0].value.links,
-                event: event
+                event: d3.event
             });
         });
 
@@ -207,23 +216,37 @@ const drawCalendar = (props) => {
         .attr("d", props.outline === "quarter" ? quarterPath : monthPath) : null;
     
     props.data.forEach( d => {
-        var valueFormatted = props.formatting !== "" ? SSF.format(props.formatting, d.value.value) : LookerCharts.Utils.textForCell(d.value)
-        d3.select("#D"+format(d.date))
-        .attr("fill", d.value.value ? color(d.value.value) : "#FFF")
-        .select("title")
-        .text(format(d.date) + ": " + valueFormatted)
-        .on("click", LookerCharts.Utils.openDrillMenu(d.value.links));
+      var valueFormatted = props.formatting !== "" ? SSF.format(props.formatting, d.value.value) : LookerCharts.Utils.textForCell(d.value)
+      d3.select("#D"+format(d.date))
+      .on("click", function(_d) {
+        if(props.details.crossfilterEnabled) {
+          LookerCharts.Utils.crossfilter({
+            row: d.row,
+            event: d3.event
+          })
+          console.log(props.details)
+        } else {
+          LookerCharts.Utils.openDrillMenu({
+            links: d.value.links, 
+            event: d3.event
+          });
+        }
+      })
+      .attr("fill", d.value.value ? color(d.value.value) : "#FFF")
+      .select("title")
+      .text(format(d.date) + ": " + valueFormatted)
+
     })
     var baseL = props.color.length === 1 ? 4 : props.color.length;
     var legendX = Math.round(props.width - (cellSize*(baseL+5)));
     var svg = d3.select(".vis")
-    .append("svg")
-    .attr("class", "legendSVG")
-    .attr("width", "100%")
-    .attr('font-size', '1.5vw');
+      .append("svg")
+      .attr("class", "legendSVG")
+      .attr("width", "100%")
+      .attr('font-size', '1.5vw');
     svg.append("g")
-    .attr("class", "legendLinear")
-    .attr("transform", "translate(" + legendX + ",10)");
+      .attr("class", "legendLinear")
+      .attr("transform", "translate(" + legendX + ",10)");
 
     var range_labels = [];
     props.color.length !== 1 ? props.color.forEach(function(d, i) {

@@ -204,10 +204,11 @@ looker.plugins.visualizations.add({
       return {
         dimension: d[dim1], 
         value: d[meas1],
-        date: moment(d[dim1].value)._d
+        date: moment(d[dim1].value)._d,
+        row: d
       }
     });
-    
+
     if (chunks.length == 0) {
       this.addError({
         title: "Wrong input pattern or insufficient data.",
@@ -215,7 +216,7 @@ looker.plugins.visualizations.add({
       });
       return;
     }
-
+    console.log(details)
     this.chart = ReactDOM.render(
       <CalendarHeatmap
          data = {chunks}
@@ -241,6 +242,7 @@ looker.plugins.visualizations.add({
          cell_reducer = {config.cell_reducer}
          axis_label_color = {config.axis_label_color}
          outline_color = {config.outline_color}
+         details = {details}
         />,
       element
     );
