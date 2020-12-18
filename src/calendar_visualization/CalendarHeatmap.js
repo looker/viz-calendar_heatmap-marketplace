@@ -180,11 +180,10 @@ const drawCalendar = (props) => {
         })
         .on("click", function (d) {
           if (props.details.crossfilterEnabled) {
-            let row = {};
-            row[`${props.date_dim.replace("_date", "_month_num")}`] = {value: d + 1};
-            row[`${props.meas_name}`] = {value: null}
+            let _row = {};
+            _row[`${props.date_dim.replace("_date", "_month_num")}`] = {value: d + 1};
             LookerCharts.Utils.toggleCrossfilter({
-              row: row,
+              row: _row,
               event: d3.event,
             });
           }
@@ -225,11 +224,10 @@ const drawCalendar = (props) => {
         })
         .on("click", function (d) {
           if (props.details.crossfilterEnabled) {
-            let row = {};
-            row[`${props.date_dim.replace("_date", "_year")}`] = {value: d};
-            row[`${props.meas_name}`] = {value: null}
+            let _row = {};
+            _row[`${props.date_dim.replace("_date", "_year")}`] = {value: d};
             LookerCharts.Utils.toggleCrossfilter({
-              row: row,
+              row: _row,
               event: d3.event,
             });
           }
@@ -310,8 +308,10 @@ const drawCalendar = (props) => {
     d3.select("#D" + format(d.date))
       .on("click", function (_d) {
         if (props.details.crossfilterEnabled) {
+          let _row = {}
+          _row[props.date_dim] = d.row[props.date_dim]
           LookerCharts.Utils.toggleCrossfilter({
-            row: d.row,
+            row: _row,
             event: d3.event,
           });
         } else {
