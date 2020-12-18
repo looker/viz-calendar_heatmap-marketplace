@@ -1,32 +1,40 @@
 # Calendar Heatmap Visualization
 
 ### What if I find an error? Suggestions for improvements?
+
 Great! Marketplace content -- including visualizations -- were designed for continuous improvement through the help of the entire Looker community and we'd love your input. To report an error or improvement recommendation, please reach out to Looker support via email to support@looker.com or via chat to submit a request. Please be as detailed as possible in your explanation and we'll address it as quick as we can.
 
-
 ### Interested in extending the visualization for your own use case?
+
 #### Quickstart Dev Instructions
+
 1.  **Install Dependecies.**
 
     Using yarn, install all dependencies
+
     ```
     yarn
     ```
-2. **Make changes to the source code**
+
+2.  **Make changes to the source code**
 
 3.  **Compile your code**
 
     You need to compile your react code, let's run:
+
     ```
     yarn build
     ```
+
     Recommended: Webpack can detect changes and build automatically
-     ```
+
+    ```
     yarn watch
     ```
+
     Your compiled code can be found in this repo.
 
-**`calendar_chart.js`**: This visualization's minified distribution file. 
+**`calendar_chart.js`**: This visualization's minified distribution file.
 
 **`LICENSE`**: Looker's Marketplace content License file.
 
@@ -43,4 +51,3 @@ Great! Marketplace content -- including visualizations -- were designed for cont
 **`yarn.lock`**: [Yarn](https://yarnpkg.com/) is a package manager alternative to npm. This file serves essentially the same purpose as `package-lock.json`, just for a different package management system.
 
 **`.babelrc`**: A configuration file for the Babel jsx -> js compiler.
-
