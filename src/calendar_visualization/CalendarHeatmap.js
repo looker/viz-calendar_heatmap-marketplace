@@ -56,6 +56,13 @@ const CalendarHeatmap = (props) => {
 };
 
 const drawCalendar = (props) => {
+  var svg = d3
+    .select(".vis")
+    .append("svg")
+    .attr("id", "vis-svg")
+    .attr("width", "100%")
+    .attr("height", "98%");
+
   var chartSize = props.width,
     cellSize = chartSize / 60;
 
@@ -138,8 +145,8 @@ const drawCalendar = (props) => {
   var monthLabelPadding = 35;
   props.label_month
     ? d3
-        .select(".vis")
-        .append("svg")
+        .select("#vis-svg")
+        .append("g")
         .attr("class", "monthLabels")
         .attr("width", chartSize)
         .attr("height", monthLabelPadding)
@@ -183,20 +190,24 @@ const drawCalendar = (props) => {
     min_date.getYear() + 1900,
     max_date.getYear() + 1900 + 1
   );
-  var svg = d3
-    .select(".vis")
+  var height = Math.max(cellSize * 8, props.height / (years.length + 1));
+  var year = d3
+    .select("#vis-svg")
     .selectAll(".year")
     .data(years)
     .enter()
-    .append("svg")
-    .attr("width", chartSize)
-    .attr("height", Math.max(cellSize * 8, props.height / (years.length + 1)))
-    .attr("class", "year")
     .append("g")
-    .attr("transform", "translate(" + (chartSize - cellSize * 53) / 2 + ",5)");
+    .attr("width", chartSize)
+    .attr("height", height)
+    .attr("class", "year")
+    .attr("transform", function (d, i) {
+      let x = (chartSize - cellSize * 53) / 2;
+      let y = height * i + monthLabelPadding;
+      return "translate(" + x + "," + y + ")";
+    });
 
   props.label_year
-    ? svg
+    ? year
         .append("text")
         .attr("font-size", "2vw")
         .attr("transform", "translate(-6," + cellSize * 3.5 + ")rotate(-90)")
@@ -217,7 +228,7 @@ const drawCalendar = (props) => {
         })
     : null;
 
-  var rect = svg
+  var rect = year
     .selectAll(".day")
     .data(function (d) {
       return d3.timeDays(new Date(d, 0, 1), new Date(d + 1, 0, 1));
@@ -263,7 +274,7 @@ const drawCalendar = (props) => {
     });
 
   props.outline !== "none"
-    ? svg
+    ? year
         .selectAll(".month")
         .data(function (d) {
           var monthArr = d3.timeMonths(
@@ -296,20 +307,19 @@ const drawCalendar = (props) => {
   });
   var baseL = props.color.length === 1 ? 4 : props.color.length;
   var legendX = Math.round(chartSize - cellSize * (baseL + 5));
-  var svg = d3
-    .select(".vis")
-    .append("svg")
+  var legendY =
+    height * years.length + 2 * cellSize + (props.rounded ? 20 : 10);
+  var legend = d3
+    .select("#vis-svg")
+    .append("g")
     .attr("class", "legendSVG")
     .attr("width", "100%")
     .attr("height", 2 * cellSize)
     .attr("font-size", "1.5vw");
-  svg
+  legend
     .append("g")
     .attr("class", "legendLinear")
-    .attr(
-      "transform",
-      "translate(" + legendX + "," + (props.rounded ? "20" : "10") + ")"
-    );
+    .attr("transform", "translate(" + legendX + "," + legendY + ")");
 
   var range_labels = [];
   props.color.length !== 1
@@ -372,7 +382,7 @@ const drawCalendar = (props) => {
         .style("opacity", 1.0);
     });
 
-  props.legend ? svg.select(".legendLinear").call(legendLinear) : null;
+  props.legend ? legend.select(".legendLinear").call(legendLinear) : null;
 
   function showTooltip(d) {
     //if showTooltip is passed a selection, then we know it's a legend swatch. Otherwise, it's a normal rect
