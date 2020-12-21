@@ -61,10 +61,10 @@ const drawCalendar = (props) => {
     .append("svg")
     .attr("id", "vis-svg")
     .attr("width", "100%")
-    .attr("height", "98%");
+    
 
-  var chartSize = props.width,
-    cellSize = chartSize / 60;
+  var chartSize = Math.max(props.width, props.height),
+    cellSize = (chartSize/60);
 
   var percent = d3.format(".1%"),
     format = d3.timeFormat("%Y-%m-%d"),
@@ -81,11 +81,6 @@ const drawCalendar = (props) => {
 
   let max_date = d3.max(props.data, (d) => d.date);
   let min_date = d3.min(props.data, (d) => d.date);
-
-  let num_years = d3.range(
-    min_date.getYear() + 1900,
-    max_date.getYear() + 1900 + 1
-  ).length;
 
   var Rainbow = require("rainbowvis.js");
   var rainbow = new Rainbow();
@@ -190,7 +185,10 @@ const drawCalendar = (props) => {
     min_date.getYear() + 1900,
     max_date.getYear() + 1900 + 1
   );
+
   var height = Math.max(cellSize * 8, props.height / (years.length + 1));
+  svg.attr("height", height * (years.length + 1) - 8);
+
   var year = d3
     .select("#vis-svg")
     .selectAll(".year")
@@ -319,7 +317,9 @@ const drawCalendar = (props) => {
   legend
     .append("g")
     .attr("class", "legendLinear")
-    .attr("transform", "translate(" + legendX + "," + legendY + ")");
+    .attr("transform", 
+      "translate(" + legendX + "," + legendY + ")"
+    );
 
   var range_labels = [];
   props.color.length !== 1
