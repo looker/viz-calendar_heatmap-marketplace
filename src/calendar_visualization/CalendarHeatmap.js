@@ -9,8 +9,6 @@ import styled from "styled-components";
 const CalendarChartWrapper = styled.div`
   font-family: "Roboto", "Open Sans", "Noto Sans JP", "Noto Sans",
     "Noto Sans CJK KR", Helvetica, Arial, sans-serif;
-  color: #3a4245;
-  height: 100%;
   justify-content: center;
   align-items: center;
   text-align: center;
