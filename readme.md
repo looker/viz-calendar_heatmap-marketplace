@@ -29,7 +29,7 @@ Great! Marketplace content -- including visualizations -- were designed for cont
     Recommended: Webpack can detect changes and build automatically
 
     ```
-    yarn watch
+    yarn start
     ```
 
     Your compiled code can be found in this repo.
