@@ -42,18 +42,17 @@ const CalendarChartWrapper = styled.div`
 `;
 
 const CalendarHeatmap = (props) => {
-  useEffect(() => {
-    d3.selectAll("svg").remove();
-    d3.selectAll(".year").remove();
-    d3.selectAll(".monthLabels").remove();
-    d3.selectAll(".legendSVG").remove();
-    d3.selectAll(".tooltip").remove();
-    drawCalendar(props);
-  }, [props]);
+  drawCalendar(props);
   return <CalendarChartWrapper className="vis" />;
 };
 
 const drawCalendar = (props) => {
+  d3.selectAll("svg").remove();
+  d3.selectAll(".year").remove();
+  d3.selectAll(".monthLabels").remove();
+  d3.selectAll(".legendSVG").remove();
+  d3.selectAll(".tooltip").remove();
+
   var svg = d3
     .select(".vis")
     .append("svg")

@@ -148,6 +148,8 @@ looker.plugins.visualizations.add({
     this.chart = ReactDOM.render(<div className="vis"></div>, element);
   },
   updateAsync: function (data, element, config, queryResponse, details, done) {
+    console.log("Looker Draw")
+
     this.clearErrors();
 
     if (queryResponse.fields.measure_like.length == 0) {
