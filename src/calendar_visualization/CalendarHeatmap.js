@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
 import * as d3 from "d3";
-import "d3-selection";
-import "d3-transition";
 import { legendColor, legendHelpers } from "d3-svg-legend";
 import SSF from "ssf";
 import styled from "styled-components";
+import { VegaChart } from "../Tooltip/vega-charts/VegaChart";
 
 const CalendarChartWrapper = styled.div`
   font-family: "Roboto", "Open Sans", "Noto Sans JP", "Noto Sans",
@@ -59,7 +58,6 @@ const drawCalendar = (props) => {
     .append("svg")
     .attr("id", "vis-svg")
     .attr("width", "100%")
-    
 
   var chartSize = Math.max(props.width, props.height),
     cellSize = (chartSize/60);
@@ -72,6 +70,7 @@ const drawCalendar = (props) => {
     .select(".vis")
     .append("div")
     .attr("class", "tooltip")
+    .attr("id", "tooltip")
     .style("opacity", 0);
 
   let max_value = d3.max(props.data, (d) => d.value.value);
@@ -249,7 +248,12 @@ const drawCalendar = (props) => {
     .attr("y", function (d) {
       return d.getDay() * cellSize;
     })
-    .on("mouseover", showTooltip)
+    .on("mouseover", function(d){
+      var target = props.data.filter(function (v) {
+        return format(v.date) === format(d);
+      });
+      showVegaChart(target)
+    })
     .on("mouseleave", hideTooltip)
     .on("click", function (d) {
       var target = props.data.filter(function (v) {
@@ -381,6 +385,17 @@ const drawCalendar = (props) => {
     });
 
   props.legend ? legend.select(".legendLinear").call(legendLinear) : null;
+
+  function showVegaChart(d) {
+    VegaChart({datum: d, chartType:'bar', scale: 'nominal'})
+    tooltip.style(
+      "left",
+      d3.event.pageX - tooltip.style("width").slice(0, -2) + "px"
+    )
+    .style("top", d3.event.pageY - 40 + "px")
+    .style("opacity", 0.9)
+
+  }
 
   function showTooltip(d) {
     //if showTooltip is passed a selection, then we know it's a legend swatch. Otherwise, it's a normal rect

@@ -1,11 +1,13 @@
 {
-  "presets": ["@babel/preset-env", "@babel/preset-react"],
-  "plugins": [
+  "presets": [
     [
-      "@babel/plugin-proposal-class-properties",
+      "@babel/preset-env",
       {
-        "loose": true
+        "targets": {
+          "node": "10"
+        }
       }
-    ]
+    ],
+    "@babel/preset-react"
   ]
 }

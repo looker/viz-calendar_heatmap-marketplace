@@ -4,6 +4,7 @@ import CalendarHeatmap from "./CalendarHeatmap";
 import * as d3 from "d3";
 import moment from "moment";
 import { timeYears } from "d3";
+import {TURTLES, prepareTurtlesQuery} from '../Tooltip/turtles'
 
 const colorByOps = {
   SEGMENT: "segment",
@@ -157,7 +158,7 @@ looker.plugins.visualizations.add({
       });
       return;
     }
-    if (queryResponse.fields.measure_like.length > 1) {
+    if (queryResponse.fields.measure_like.length > 2) {
       this.addError({
         title: "Wrong input data.",
         message: "This chart requires 1 measure.",
@@ -213,11 +214,13 @@ looker.plugins.visualizations.add({
         ? queryResponse.fields.measure_like[0].value_format
         : "";
 
+    let turtleQuery = Object.keys(data[0]).find(e => e.startsWith(TURTLES))
     let chunks = data.map((d) => {
       return {
         dimension: d[dim1],
         value: d[meas1],
         date: moment(d[dim1].value)._d,
+        ...(turtleQuery && {turtle: prepareTurtlesQuery(d, dim1, turtleQuery, queryResponse)})
       };
     });
 

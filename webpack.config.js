@@ -3,7 +3,7 @@ var path = require("path");
 const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 
 var webpackConfig = {
-  mode: "production",
+  mode: "development",
   entry: {
     calendar_chart: "./src/calendar_visualization/calendar_chart_container.js",
   },
@@ -20,7 +20,6 @@ var webpackConfig = {
     extensions: [".js"],
     modules: [path.join(__dirname, "../src"), "node_modules"],
   },
-  plugins: [new UglifyJSPlugin()],
   module: {
     rules: [
       { test: /\.(js|jsx)$/, use: "babel-loader" },
